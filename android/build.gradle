@@ -25,7 +25,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    // Standard compilation options
+    namespace 'com.homebackend.flutter_common'
+
     compileSdk 34
 
     compileOptions {
