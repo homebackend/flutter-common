@@ -59,3 +59,9 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.dev/to/font-from-package
+
+  plugin:
+    platforms:
+      android:
+        package: com.homebackend.flutter_common
+        pluginClass: FlutterCommonPlugin
