@@ -68,11 +68,7 @@ class AppUpdateDialog extends StatelessWidget with FieldsCommon {
                     ),
                   ),
                   horizontalSpacing(),
-                  Expanded(
-                    child: CopyableText(
-                      text: downloadUrl!,
-                    ),
-                  ),
+                  Expanded(child: CopyableText(text: downloadUrl!)),
                 ],
               ),
             ],
@@ -80,16 +76,18 @@ class AppUpdateDialog extends StatelessWidget with FieldsCommon {
             verticalSpacing(),
             Text(
               'Changelog / Commits:',
-              style: theme.textTheme.titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             verticalSpacing(),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: theme.colorScheme.outlineVariant),
                 ),
@@ -131,8 +129,9 @@ class AppUpdateDialog extends StatelessWidget with FieldsCommon {
           style: ElevatedButton.styleFrom(
             backgroundColor: theme.colorScheme.primary,
             foregroundColor: theme.colorScheme.onPrimary,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           child: Text(onProceed == null ? 'OK' : 'Install Update'),
         ),

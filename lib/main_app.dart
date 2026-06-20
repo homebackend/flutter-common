@@ -22,14 +22,18 @@ class MainApp extends StatelessWidget {
   final String githubOrganization;
   final String githubRepo;
   final String baseAssetName;
+  final String appName;
   final String appIcon;
+  final String upgradeFileName;
   final Widget Function() mainApp;
   const MainApp(
     this.githubOrganization,
     this.githubRepo,
     this.baseAssetName,
+    this.appName,
     this.appIcon,
     this.mainApp, {
+    this.upgradeFileName = 'app-release.apk',
     super.key,
   });
 
@@ -107,6 +111,8 @@ class MainApp extends StatelessWidget {
                                 return mainApp();
                               case AppInitializationState.updateApp:
                                 return UpdateApp(
+                                  appName,
+                                  upgradeFileName,
                                   status.downloadUrl,
                                   status.latestVersion,
                                   status.changeLog,
