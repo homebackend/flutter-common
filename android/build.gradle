@@ -2,7 +2,7 @@ group 'com.homebackend.flutter_common'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.8.22' // Adjust to match your project if needed
+    ext.kotlin_version = '1.8.22'
     repositories {
         google()
         mavenCentral()
@@ -27,7 +27,7 @@ apply plugin: 'kotlin-android'
 android {
     namespace 'com.homebackend.flutter_common'
 
-    compileSdk 34
+    compileSdk 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -44,6 +44,5 @@ android {
 }
 
 dependencies {
-    // This provides the 'implementation' configuration scope that Gradle is looking for
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
