@@ -33,12 +33,16 @@ class AppUpdateDialog extends StatelessWidget with FieldsCommon {
 
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Row(
-        children: [
-          Icon(Icons.system_update_alt, color: theme.colorScheme.primary),
-          const SizedBox(width: 12),
-          const Text('New Update Available'),
-        ],
+      title: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: [
+            Icon(Icons.system_update_alt, color: theme.colorScheme.primary),
+            const SizedBox(width: 12),
+            const Text('New Update Available'),
+          ],
+        ),
       ),
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.85,
