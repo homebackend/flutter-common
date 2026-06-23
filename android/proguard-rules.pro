@@ -1,1 +1,2 @@
+-keep class sk.fourq.otaupdate.** { *; }
 -keep class sk.fourq.ota_update.** { *; }
