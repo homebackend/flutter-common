@@ -1,0 +1,1 @@
+-keep class sk.fourq.ota_update.** { *; }
