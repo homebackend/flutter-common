@@ -9,6 +9,8 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:dart_ipify/dart_ipify.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -74,4 +76,46 @@ LinuxFamily getLinuxDistributionFamily() {
   }
 
   return LinuxFamily.unknown;
+}
+
+Future<Map<String, dynamic>> generateAuditPayload() async {
+  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  String platformLabel = "Unknown";
+  String identifier = "Unknown";
+
+  try {
+    if (isAndroidPlatform()) {
+      final info = await deviceInfo.androidInfo;
+      platformLabel = "Android (${info.brand} ${info.model})";
+      identifier = info.id;
+    } else if (isIOSPlatform()) {
+      final info = await deviceInfo.iosInfo;
+      platformLabel = "iOS (${info.model})";
+      identifier = info.identifierForVendor ?? "Unknown_iOS";
+    } else if (isWindowsPlatform()) {
+      final info = await deviceInfo.windowsInfo;
+      platformLabel = "Windows";
+      identifier = info.computerName;
+    } else if (isLinuxPlatform()) {
+      final info = await deviceInfo.linuxInfo;
+      platformLabel = "Linux (${info.name})";
+      identifier = info.machineId ?? "Unknown_Linux";
+    }
+  } catch (e) {
+    log('Error getting device info: $e');
+  }
+
+  String ipAddress = "0.0.0.0";
+  try {
+    ipAddress = await Ipify.ipv4();
+  } catch (e) {
+    log('Error getting IP info: $e');
+  }
+
+  return {
+    "device_platform": platformLabel,
+    "device_hardware_id": identifier,
+    "client_ip_address": ipAddress,
+    "sync_timestamp": DateTime.now().toIso8601String(),
+  };
 }
