@@ -7,3 +7,4 @@
  */
 
 export 'main_app.dart';
+export 'tool.dart';
