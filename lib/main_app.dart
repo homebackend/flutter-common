@@ -52,7 +52,7 @@ class MainApp extends StatelessWidget {
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (_, themeState) => MaterialApp(
-          title: 'Netr',
+          title: appName,
           debugShowCheckedModeBanner: false,
           theme: themeState.data,
           home: ScaffoldMessenger(
