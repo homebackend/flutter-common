@@ -255,7 +255,7 @@ class AppInitializationCubit extends Cubit<AppInitializationStatus> {
     required String changelog,
     required String downloadLink,
   }) {
-    AppInitializationState state = isAndroidPlatform()
+    AppInitializationState state = isAndroidPlatform() || isLinuxPlatform()
         ? AppInitializationState.updateApp
         : AppInitializationState.showUpdateDetails;
 

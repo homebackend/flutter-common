@@ -66,7 +66,11 @@ class _UpdateAppState extends State<UpdateApp> {
         changeLog: widget.changeLog,
         onProceed: widget.downloadUrl != null
             ? () {
-                _updateCubit.tryOtaUpdate(widget.downloadUrl!);
+                if (isAndroidPlatform()) {
+                  _updateCubit.tryOtaUpdate(widget.downloadUrl!);
+                } else if (isLinuxPlatform()) {
+                  _updateCubit.tryLinuxUpdate(widget.downloadUrl!);
+                }
               }
             : null,
         onDismiss: widget.back,
