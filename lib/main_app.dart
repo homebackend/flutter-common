@@ -18,7 +18,7 @@ import 'tool.dart';
 import 'update_app.dart';
 import 'widgets/app_update_detailer.dart';
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   final String githubOrganization;
   final String githubRepo;
   final String baseAssetName;
@@ -38,21 +38,40 @@ class MainApp extends StatelessWidget {
   });
 
   @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
+  late final AppInitializationCubit _appInitializationCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsFlutterBinding.ensureInitialized();
+    _appInitializationCubit = AppInitializationCubit(
+      widget.githubOrganization,
+      widget.githubRepo,
+      widget.baseAssetName,
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _appInitializationCubit.checkUpdateRequired();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => ThemeCubit()..setInitialTheme()),
-        BlocProvider(
-          create: (_) => AppInitializationCubit(
-            githubOrganization,
-            githubRepo,
-            baseAssetName,
-          )..initialize(),
-        ),
+        BlocProvider(create: (_) => _appInitializationCubit..initialize()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (_, themeState) => MaterialApp(
-          title: appName,
+          title: widget.appName,
           debugShowCheckedModeBanner: false,
           theme: themeState.data,
           home: ScaffoldMessenger(
@@ -106,13 +125,13 @@ class MainApp extends StatelessWidget {
                           builder: (context, status) {
                             switch (status.state) {
                               case AppInitializationState.initialization:
-                                return SplashScreen(appIcon);
+                                return SplashScreen(widget.appIcon);
                               case AppInitializationState.showUpdateDetails:
-                                return mainApp();
+                                return widget.mainApp();
                               case AppInitializationState.updateApp:
                                 return UpdateApp(
-                                  appName,
-                                  upgradeFileName,
+                                  widget.appName,
+                                  widget.upgradeFileName,
                                   status.downloadUrl,
                                   status.latestVersion,
                                   status.changeLog,
@@ -121,9 +140,9 @@ class MainApp extends StatelessWidget {
                                       .emitInitialized(),
                                 );
                               case AppInitializationState.initialized:
-                                return mainApp();
+                                return widget.mainApp();
                               case AppInitializationState.updateCheckFailed:
-                                return mainApp();
+                                return widget.mainApp();
                             }
                           },
                         ),
