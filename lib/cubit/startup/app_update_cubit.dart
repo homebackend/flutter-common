@@ -161,10 +161,12 @@ class AppUpdateCubit extends Cubit<AppUpdateStatus> {
         log('Auto-restart failed: $e — user will need to launch manually');
       }
 
+      await Future.delayed(const Duration(milliseconds: 500));
+
       exit(0);
     } catch (e) {
       final f = File(tmpPath);
-      if (await f.exists()) await f.delete().catchError((_) {});
+      if (await f.exists()) await f.delete();
       emit(AppUpdateStatus(AppUpdateState.error, error: e.toString()));
     }
   }
