@@ -51,6 +51,8 @@ abstract class MainWithAppSetupState<T extends StatefulWidget> extends State<T>
     });
   }
 
+  Widget buildMainApp(BuildContext context);
+
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
@@ -65,31 +67,6 @@ abstract class MainWithAppSetupState<T extends StatefulWidget> extends State<T>
       );
     }
 
-    return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_view_day),
-            activeIcon: Icon(Icons.calendar_view_day_outlined),
-            label: 'Schedule',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.picture_as_pdf),
-            label: 'PDF',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.music_note), label: 'Audio'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics_outlined),
-            label: 'Athlete Tracker',
-          ),
-        ],
-      ),
-    );
+    return buildMainApp(context);
   }
 }
