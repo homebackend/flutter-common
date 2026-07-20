@@ -43,9 +43,7 @@ abstract class MainWithAppSetupState<T extends StatefulWidget> extends State<T>
 
     setState(() {
       _initialized = true;
-      if (allKeysExist) {
-        _requireSetup = true;
-      }
+      _requireSetup = !allKeysExist;
     });
   }
 
@@ -58,11 +56,10 @@ abstract class MainWithAppSetupState<T extends StatefulWidget> extends State<T>
     }
 
     if (_requireSetup) {
-      return AppSetup(
-        this,
-        appSetupFields,
-        () => setState(() => _requireSetup = false),
-      );
+      return AppSetup(this, appSetupFields, () async {
+        final allKeysExist = await hasConfigValues();
+        setState(() => _requireSetup = !allKeysExist);
+      });
     }
 
     return buildMainApp(context);
