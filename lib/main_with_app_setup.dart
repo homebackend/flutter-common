@@ -23,10 +23,8 @@ abstract class MainWithAppSetupState<T extends StatefulWidget> extends State<T>
 
   bool _initialized = false;
   bool _requireSetup = false;
-  int _currentIndex = 0;
   @override
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
-  late final List<Widget> _pages;
 
   @override
   void initState() {
