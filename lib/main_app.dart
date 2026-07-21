@@ -25,6 +25,7 @@ class MainApp extends StatefulWidget {
   final String appName;
   final String appIcon;
   final String upgradeFileName;
+  final Color? appSeedColor;
   final Widget Function() mainApp;
   const MainApp(
     this.githubOrganization,
@@ -33,6 +34,7 @@ class MainApp extends StatefulWidget {
     this.appName,
     this.appIcon,
     this.mainApp, {
+    this.appSeedColor,
     this.upgradeFileName = 'app-release.apk',
     super.key,
   });
@@ -66,7 +68,10 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => ThemeCubit()..setInitialTheme()),
+        BlocProvider(
+          create: (_) =>
+              ThemeCubit(seedColor: widget.appSeedColor)..setInitialTheme(),
+        ),
         BlocProvider(create: (_) => _appInitializationCubit..initialize()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(

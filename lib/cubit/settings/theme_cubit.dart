@@ -18,7 +18,9 @@ class ThemeCubit extends Cubit<ThemeState> {
 
   static final String prefUseDarkTheme = 'useDarkTheme';
 
-  ThemeCubit() : super(ThemeState(_light));
+  Color? seedColor;
+
+  ThemeCubit({this.seedColor}) : super(ThemeState(_light));
 
   void toggleTheme(bool useDarkTheme) {
     _toggleTheme(useDarkTheme);
@@ -26,10 +28,24 @@ class ThemeCubit extends Cubit<ThemeState> {
   }
 
   void _toggleTheme(bool useDarkTheme) {
-    if (useDarkTheme) {
-      emit(ThemeState(_dark));
+    if (seedColor == null) {
+      if (useDarkTheme) {
+        emit(ThemeState(_dark));
+      } else {
+        emit(ThemeState(_light));
+      }
     } else {
-      emit(ThemeState(_light));
+      final scheme = useDarkTheme
+          ? ColorScheme.fromSeed(
+              seedColor: Color(0xFFEA7B2C),
+              brightness: Brightness.dark,
+            )
+          : ColorScheme.fromSeed(
+              seedColor: Color(0xFFEA7B2C),
+              brightness: Brightness.light,
+            );
+
+      emit(ThemeState(ThemeData(colorScheme: scheme, useMaterial3: true)));
     }
   }
 
