@@ -12,9 +12,15 @@ import 'package:flutter_common/mixin/main_config_manager.dart';
 class AppSetupField {
   String storageKey;
   String labelText;
+  bool? emptyAllowed;
   bool obscureText;
 
-  AppSetupField(this.storageKey, this.labelText, this.obscureText);
+  AppSetupField(
+    this.storageKey,
+    this.labelText,
+    this.obscureText, {
+    this.emptyAllowed,
+  });
 }
 
 class AppSetup extends StatefulWidget {
@@ -90,9 +96,19 @@ class _AppSetupState extends State<AppSetup> {
                     ),
                   );
 
+                  final emptyAllowed = Map.fromEntries(
+                    widget.setupFields.map(
+                      (f) => MapEntry(f.storageKey, f.emptyAllowed == true),
+                    ),
+                  );
+
                   setState(() {
                     _errors = values.entries
-                        .map((e) => e.value.isEmpty ? 'Required' : null)
+                        .map(
+                          (e) => !emptyAllowed[e.key]! && e.value.isEmpty
+                              ? 'Required'
+                              : null,
+                        )
                         .toList();
                   });
 
