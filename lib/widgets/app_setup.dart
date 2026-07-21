@@ -112,7 +112,11 @@ class _AppSetupState extends State<AppSetup> {
                         .toList();
                   });
 
-                  if (values.entries.any((e) => e.value.isEmpty)) return;
+                  if (values.entries.any(
+                    (e) => !emptyAllowed[e.key]! && e.value.isEmpty,
+                  )) {
+                    return;
+                  }
 
                   widget.configManager.setConfigValues(values);
                 },
