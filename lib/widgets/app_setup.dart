@@ -138,6 +138,22 @@ class _AppSetupState extends State<AppSetup> {
                   }
                 },
               ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.paste),
+                label: const Text('Import Configuration from Clipboard'),
+                onPressed: () async {
+                  final msg = await widget.configManager
+                      .importSystemPreferencesFromClipboard();
+                  if (msg != null && context.mounted) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(msg)));
+                  } else {
+                    widget.onImport();
+                  }
+                },
+              ),
             ],
           ),
         ),

@@ -8,9 +8,9 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../widgets/app_setup.dart';
@@ -101,6 +101,26 @@ mixin MainConfigManager {
       }
     } catch (e) {
       return "Import failed: Invalid configuration template. $e";
+    }
+  }
+
+  Future<String?> importSystemPreferencesFromClipboard() async {
+    try {
+      final data = await Clipboard.getData('text/plain');
+      final text = data?.text?.trim();
+
+      if (text == null || text.isEmpty) {
+        return 'Import failed: Clipboard is empty';
+      }
+
+      final Map<String, dynamic> config = json.decode(text);
+      await setConfigValues(config);
+
+      return await hasConfigValues()
+          ? null
+          : 'Import failed: Some configuration parameters are missing';
+    } catch (e) {
+      return "Import failed: Invalid JSON in clipboard. $e";
     }
   }
 }
