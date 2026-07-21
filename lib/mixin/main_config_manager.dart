@@ -13,8 +13,11 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../widgets/app_setup.dart';
+
 mixin MainConfigManager {
   List<String> get storageKeys;
+  List<AppSetupField> get appSetupFields;
   FlutterSecureStorage get secureStorage;
 
   void notifyConfigReload();
@@ -34,7 +37,10 @@ mixin MainConfigManager {
   }
 
   Future<bool> hasConfigValues() async {
-    return (await getConfigValues()).entries.every((e) => e.value != null);
+    final config = await getConfigValues();
+    return appSetupFields.every(
+      (f) => f.emptyAllowed ?? false || config[f.storageKey] != null,
+    );
   }
 
   Future<void> setConfigValues(Map<String, dynamic> config) async {
