@@ -15,6 +15,7 @@ import 'widgets/app_setup.dart';
 
 abstract class MainWithAppSetupState<T extends StatefulWidget> extends State<T>
     implements MainConfigManager {
+  @override
   List<AppSetupField> get appSetupFields;
 
   @override

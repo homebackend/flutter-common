@@ -16,6 +16,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../widgets/app_setup.dart';
 
 mixin MainConfigManager {
+  String get configFileBaseName;
   List<String> get storageKeys;
   List<AppSetupField> get appSetupFields;
   FlutterSecureStorage get secureStorage;
@@ -61,7 +62,7 @@ mixin MainConfigManager {
 
       final String? outputPath = await FilePicker.saveFile(
         dialogTitle: 'Export Configuration Settings',
-        fileName: 'tennis_tool_config_backup.json',
+        fileName: '${configFileBaseName}_backup.json',
         type: FileType.custom,
         allowedExtensions: ['json'],
         bytes: fileBytes,
