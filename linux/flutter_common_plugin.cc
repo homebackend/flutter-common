@@ -8,8 +8,10 @@
 
 #include "flutter_common_plugin_private.h"
 
-#define FLUTTER_COMMON_PLUGIN(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), flutter_common_plugin_get_type(), \
+#include <window_manager/window_manager_plugin.h>
+
+#define FLUTTER_COMMON_PLUGIN(obj)                                             \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), flutter_common_plugin_get_type(),         \
                               FlutterCommonPlugin))
 
 struct _FlutterCommonPlugin {
@@ -19,12 +21,12 @@ struct _FlutterCommonPlugin {
 G_DEFINE_TYPE(FlutterCommonPlugin, flutter_common_plugin, g_object_get_type())
 
 // Called when a method call is received from Flutter.
-static void flutter_common_plugin_handle_method_call(
-    FlutterCommonPlugin* self,
-    FlMethodCall* method_call) {
+static void
+flutter_common_plugin_handle_method_call(FlutterCommonPlugin *self,
+                                         FlMethodCall *method_call) {
   g_autoptr(FlMethodResponse) response = nullptr;
 
-  const gchar* method = fl_method_call_get_name(method_call);
+  const gchar *method = fl_method_call_get_name(method_call);
 
   if (strcmp(method, "getPlatformVersion") == 0) {
     response = get_platform_version();
@@ -35,7 +37,7 @@ static void flutter_common_plugin_handle_method_call(
   fl_method_call_respond(method_call, response, nullptr);
 }
 
-FlMethodResponse* get_platform_version() {
+FlMethodResponse *get_platform_version() {
   struct utsname uname_data = {};
   uname(&uname_data);
   g_autofree gchar *version = g_strdup_printf("Linux %s", uname_data.version);
@@ -43,34 +45,46 @@ FlMethodResponse* get_platform_version() {
   return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
 }
 
-static void flutter_common_plugin_dispose(GObject* object) {
+static void flutter_common_plugin_dispose(GObject *object) {
   G_OBJECT_CLASS(flutter_common_plugin_parent_class)->dispose(object);
 }
 
-static void flutter_common_plugin_class_init(FlutterCommonPluginClass* klass) {
+static void flutter_common_plugin_class_init(FlutterCommonPluginClass *klass) {
   G_OBJECT_CLASS(klass)->dispose = flutter_common_plugin_dispose;
 }
 
-static void flutter_common_plugin_init(FlutterCommonPlugin* self) {}
+static void flutter_common_plugin_init(FlutterCommonPlugin *self) {}
 
-static void method_call_cb(FlMethodChannel* channel, FlMethodCall* method_call,
+static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
                            gpointer user_data) {
-  FlutterCommonPlugin* plugin = FLUTTER_COMMON_PLUGIN(user_data);
+  FlutterCommonPlugin *plugin = FLUTTER_COMMON_PLUGIN(user_data);
   flutter_common_plugin_handle_method_call(plugin, method_call);
 }
 
-void flutter_common_plugin_register_with_registrar(FlPluginRegistrar* registrar) {
-  FlutterCommonPlugin* plugin = FLUTTER_COMMON_PLUGIN(
+void fl_register_plugins(FlPluginRegistry *registry) {
+  g_autoptr(FlPluginRegistrar) window_manager_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry,
+                                                  "WindowManagerPlugin");
+
+  if (window_manager_registrar != nullptr) {
+    window_manager_plugin_register_with_registrar(window_manager_registrar);
+  }
+}
+
+void flutter_common_plugin_register_with_registrar(
+    FlPluginRegistrar *registrar) {
+  FlutterCommonPlugin *plugin = FLUTTER_COMMON_PLUGIN(
       g_object_new(flutter_common_plugin_get_type(), nullptr));
 
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   g_autoptr(FlMethodChannel) channel =
       fl_method_channel_new(fl_plugin_registrar_get_messenger(registrar),
-                            "flutter_common",
-                            FL_METHOD_CODEC(codec));
-  fl_method_channel_set_method_call_handler(channel, method_call_cb,
-                                            g_object_ref(plugin),
-                                            g_object_unref);
+                            "flutter_common", FL_METHOD_CODEC(codec));
+  fl_method_channel_set_method_call_handler(
+      channel, method_call_cb, g_object_ref(plugin), g_object_unref);
+
+  FlPluginRegistry *registry = fl_plugin_registrar_get_registry(registrar);
+  fl_register_plugins(registry);
 
   g_object_unref(plugin);
 }
