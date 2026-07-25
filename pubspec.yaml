@@ -70,3 +70,7 @@ flutter:
       android:
         package: com.homebackend.flutter_common
         pluginClass: FlutterCommonPlugin
+      linux:
+        pluginClass: FlutterCommonPlugin
+      windows:
+        pluginClass: FlutterCommonPluginCApi
