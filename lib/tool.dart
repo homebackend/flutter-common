@@ -6,7 +6,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dart_ipify/dart_ipify.dart';
