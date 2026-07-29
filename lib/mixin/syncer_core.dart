@@ -12,6 +12,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_common/app_logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -109,7 +110,7 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
     if (cacheFileExists) {
       unawaited(
         _syncFromNetwork(true).catchError((e) async {
-          log('Error during background sync: $e');
+          appLogger.e('Error during background sync: $e');
           notifySyncFailed();
           await processContentPostLoad(await cacheFile.readAsBytes());
         }),
@@ -170,7 +171,7 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
 
       if (cacheFile.existsSync() && code == 304) {
         notifyLoadedFromCache();
-        log('Loaded from cache: ${runtimeType.toString()}');
+        appLogger.d('Loaded from cache: ${runtimeType.toString()}');
         await processContentPostLoad(await cacheFile.readAsBytes());
       } else if (code == 200 && bytes != null) {
         notifyLoadedFromNetwork();
@@ -184,12 +185,14 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
         }
       } else {
         notifyLoadErrorOccurred();
-        log('Error during http call: $code for ${runtimeType.toString()}');
+        appLogger.e(
+          'Error during http call: $code for ${runtimeType.toString()}',
+        );
         throw (Exception('HTTP $code'));
       }
     } catch (e) {
       thereWasException = true;
-      log('Error: $e');
+      appLogger.e('Error: $e');
       notifySyncFailed();
       rethrow;
     } finally {

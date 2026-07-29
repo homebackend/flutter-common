@@ -13,6 +13,7 @@ import 'package:dart_ipify/dart_ipify.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_common/app_logger.dart';
 
 void showSnackBar(BuildContext context, String message, {Duration? timeout}) {
   final snackBar = SnackBar(
@@ -72,7 +73,9 @@ LinuxFamily getLinuxDistributionFamily() {
       return LinuxFamily.arch;
     }
   } catch (e) {
-    log('Failed inspecting system distribution configuration settings: $e');
+    appLogger.e(
+      'Failed inspecting system distribution configuration settings: $e',
+    );
   }
 
   return LinuxFamily.unknown;
@@ -102,14 +105,14 @@ Future<Map<String, dynamic>> generateAuditPayload() async {
       identifier = info.machineId ?? "Unknown_Linux";
     }
   } catch (e) {
-    log('Error getting device info: $e');
+    appLogger.e('Error getting device info: $e');
   }
 
   String ipAddress = "0.0.0.0";
   try {
     ipAddress = await Ipify.ipv4();
   } catch (e) {
-    log('Error getting IP info: $e');
+    appLogger.e('Error getting IP info: $e');
   }
 
   return {

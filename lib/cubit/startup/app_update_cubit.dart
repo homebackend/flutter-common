@@ -11,6 +11,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_common/app_logger.dart';
 import 'package:flutter_common/tool.dart';
 import 'package:http/http.dart' as http;
 import 'package:ota_update/ota_update.dart';
@@ -25,7 +26,7 @@ class AppUpdateCubit extends Cubit<AppUpdateStatus> {
 
   Future<void> tryOtaUpdate(String downloadUrl) async {
     try {
-      log('Download url: $downloadUrl');
+      appLogger.d('Download url: $downloadUrl');
       OtaUpdate()
           .execute(downloadUrl, destinationFilename: upgradeFileName)
           .listen((OtaEvent event) {
@@ -34,7 +35,9 @@ class AppUpdateCubit extends Cubit<AppUpdateStatus> {
               case OtaStatus.INSTALLING:
                 emit(AppUpdateStatus(AppUpdateState.inProgress, event: event));
               case OtaStatus.INSTALLATION_DONE:
-                log('Installation done. Ideally this should never come');
+                appLogger.w(
+                  'Installation done. Ideally this should never come',
+                );
               case OtaStatus.ALREADY_RUNNING_ERROR:
               case OtaStatus.INSTALLATION_ERROR:
               case OtaStatus.PERMISSION_NOT_GRANTED_ERROR:
@@ -158,7 +161,9 @@ class AppUpdateCubit extends Cubit<AppUpdateStatus> {
       try {
         await Process.start(exe, [], mode: ProcessStartMode.detached);
       } catch (e) {
-        log('Auto-restart failed: $e — user will need to launch manually');
+        appLogger.e(
+          'Auto-restart failed: $e — user will need to launch manually',
+        );
       }
 
       await Future.delayed(const Duration(milliseconds: 500));

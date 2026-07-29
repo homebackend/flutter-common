@@ -10,6 +10,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_common/app_logger.dart';
 
 import 'cubit/settings/theme_cubit.dart';
 import 'cubit/startup/app_initialization_cubit.dart';
@@ -112,7 +113,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
                             current.state ==
                             AppInitializationState.updateCheckFailed,
                         listener: (_, status) {
-                          log(
+                          appLogger.e(
                             'Error during check for App update: ${status.error}',
                           );
                           showSnackBar(

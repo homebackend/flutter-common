@@ -10,6 +10,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_common/app_logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../mixin/fields_common.dart';
@@ -53,7 +54,7 @@ class CopyableText extends StatelessWidget with FieldsCommon {
                     throw 'Could not launch browser context for: $text';
                   }
                 } catch (e) {
-                  log('URL redirection failure: $e');
+                  appLogger.e('URL redirection failure: $e');
                 }
               },
               tooltip: 'Open url',

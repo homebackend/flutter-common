@@ -7,9 +7,9 @@
  */
 
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_common/app_logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pub_semver/pub_semver.dart';
@@ -86,7 +86,7 @@ class AppInitializationCubit extends Cubit<AppInitializationStatus> {
         emitInitialized();
       }
     } catch (e) {
-      log('Update validation exception: $e');
+      appLogger.e('Update validation exception: $e');
       emit(
         AppInitializationStatus(
           AppInitializationState.updateCheckFailed,
@@ -185,7 +185,7 @@ class AppInitializationCubit extends Cubit<AppInitializationStatus> {
         }
       }
     } catch (e) {
-      log('Failed resolving direct binary asset download links: $e');
+      appLogger.e('Failed resolving direct binary asset download links: $e');
     }
 
     return fallbackUrl;
@@ -259,7 +259,7 @@ class AppInitializationCubit extends Cubit<AppInitializationStatus> {
         ? AppInitializationState.updateApp
         : AppInitializationState.showUpdateDetails;
 
-    log('${state.toString()}: $rawLatestTag/$downloadLink');
+    appLogger.d('${state.toString()}: $rawLatestTag/$downloadLink');
 
     emit(
       AppInitializationStatus(
