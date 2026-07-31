@@ -25,6 +25,33 @@ void showSnackBar(BuildContext context, String message, {Duration? timeout}) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+void showErrorDialog(BuildContext context, String largeMessage) {
+  final scrollController = ScrollController();
+
+  showDialog(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: Text('Error'),
+      content: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 400, maxWidth: 400),
+        child: Scrollbar(
+          controller: scrollController,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: scrollController,
+            padding: EdgeInsets.only(right: 12),
+            child: SelectableText(largeMessage),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(c), child: Text('Copy')),
+        TextButton(onPressed: () => Navigator.pop(c), child: Text('OK')),
+      ],
+    ),
+  );
+}
+
 bool isDesktopPlatform() =>
     !kIsWeb && (isLinuxPlatform() || isWindowsPlatform() || isMacOSPlatform());
 bool isWindowsPlatform() => Platform.isWindows;
@@ -80,6 +107,8 @@ LinuxFamily getLinuxDistributionFamily() {
   return LinuxFamily.unknown;
 }
 
+String? cachedIpAddress;
+
 Future<Map<String, dynamic>> generateAuditPayload() async {
   final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   String platformLabel = "Unknown";
@@ -107,17 +136,18 @@ Future<Map<String, dynamic>> generateAuditPayload() async {
     appLogger.e('Error getting device info: $e');
   }
 
-  String ipAddress = "0.0.0.0";
-  try {
-    ipAddress = await Ipify.ipv4();
-  } catch (e) {
-    appLogger.e('Error getting IP info: $e');
+  if (cachedIpAddress == null) {
+    try {
+      cachedIpAddress = await Ipify.ipv4().timeout(Duration(seconds: 3));
+    } catch (e) {
+      appLogger.e('Error getting IP info: $e');
+    }
   }
 
   return {
     "device_platform": platformLabel,
     "device_hardware_id": identifier,
-    "client_ip_address": ipAddress,
+    "client_ip_address": cachedIpAddress ?? '0.0.0.0',
     "sync_timestamp": DateTime.now().toIso8601String(),
   };
 }
