@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class RotateButton extends StatefulWidget {
-  const RotateButton({super.key});
+class ScreenOrientationButton extends StatefulWidget {
+  const ScreenOrientationButton({super.key});
   @override
-  State<RotateButton> createState() => _RotateButtonState();
+  State<ScreenOrientationButton> createState() =>
+      _ScreenOrientationButtonState();
 }
 
-class _RotateButtonState extends State<RotateButton> {
+class _ScreenOrientationButtonState extends State<ScreenOrientationButton> {
   bool isLandscape = false;
 
   void toggle() {
