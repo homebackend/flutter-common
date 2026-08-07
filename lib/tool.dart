@@ -50,6 +50,47 @@ void showErrorDialog(BuildContext context, String largeMessage) {
   );
 }
 
+Future<bool> showConfirmDialog(
+  BuildContext context,
+  String title,
+  String message, {
+  bool isDeletion = false,
+  String okText = 'Yes',
+  String cancleText = 'Dismiss',
+  VoidCallback? okAction,
+  VoidCallback? cancleAction,
+}) async {
+  return await showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () {
+            if (cancleAction != null) cancleAction();
+            Navigator.pop(ctx, false);
+          },
+          child: Text(cancleText),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isDeletion
+                ? Theme.of(context).colorScheme.error
+                : Theme.of(context).colorScheme.primary,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            if (okAction != null) okAction();
+            Navigator.pop(ctx, true);
+          },
+          child: Text(okText),
+        ),
+      ],
+    ),
+  );
+}
+
 bool isDesktopPlatform() =>
     !kIsWeb && (isLinuxPlatform() || isWindowsPlatform() || isMacOSPlatform());
 bool isWindowsPlatform() => Platform.isWindows;
