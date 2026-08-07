@@ -38,6 +38,10 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
   void notifySyncStarted();
   void notifySyncDone();
   void notifySyncFailed();
+
+  // Users should implement if they wish to act on background conflicts
+  void notifySyncConflicts() {}
+
   Future<void> processContentPostLoad(Uint8List content);
   Future<void> processConflicts(Uint8List serverData, String serverSha);
   Future<void> syncDataLoader();
@@ -139,7 +143,7 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
     try {
       isSyncInProgress = true;
       if (isModifiable && isModified) {
-        await _saveToNetwork();
+        await _saveToNetwork(background: background);
       } else {
         if (force || DateTime.now().difference(_lastFetch) > syncDuration) {
           await _loadFromNetwork(background);
@@ -151,8 +155,8 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
     }
   }
 
-  Future<void> _saveToNetwork() async {
-    await pushWithAutoMerge();
+  Future<void> _saveToNetwork({bool background = false}) async {
+    await pushWithAutoMerge(background: background);
     final cacheFile = await _cacheFile();
     await processContentPostLoad(await cacheFile.readAsBytes());
   }
@@ -203,7 +207,10 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
     }
   }
 
-  Future<void> pushWithAutoMerge({String? retryServerFileSha}) async {
+  Future<void> pushWithAutoMerge({
+    String? retryServerFileSha,
+    bool background = false,
+  }) async {
     bool thereWasException = false;
 
     try {
@@ -229,6 +236,7 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
       }
     } catch (_) {
       thereWasException = true;
+      if (background) notifySyncConflicts();
       notifySyncFailed();
       rethrow;
     } finally {
