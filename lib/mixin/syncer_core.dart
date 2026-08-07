@@ -82,14 +82,14 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
     _syncTimer?.cancel();
     _syncTimer = Timer.periodic(
       const Duration(minutes: 1),
-      (_) => _syncFromNetwork(true),
+      (_) => _syncFromNetwork(background: true),
     );
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _syncFromNetwork(true);
+      _syncFromNetwork(background: true);
       _startTimer();
     }
     if (state == AppLifecycleState.paused ||
@@ -98,7 +98,8 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
     }
   }
 
-  Future<void> syncData() => _syncFromNetwork(true);
+  Future<void> syncData({bool background = false, bool force = false}) =>
+      _syncFromNetwork(background: background, force: force);
 
   Future<void> _loadSyncData() async {
     final cacheFile = await _cacheFile();
@@ -106,7 +107,7 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
         cacheFile.existsSync() && appEtag != null && appEtag!.isNotEmpty;
     if (cacheFileExists) {
       unawaited(
-        _syncFromNetwork(true).catchError((e) async {
+        _syncFromNetwork(background: true).catchError((e) async {
           appLogger.e('Error during background sync: $e');
           notifySyncFailed();
           await processContentPostLoad(await cacheFile.readAsBytes());
@@ -114,7 +115,7 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
       );
       await processContentPostLoad(await cacheFile.readAsBytes());
     } else {
-      await _syncFromNetwork(false);
+      await _syncFromNetwork(background: false);
     }
   }
 
@@ -127,7 +128,10 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
     await sharedPreferences.setString(keyDocumentLastModified, etag);
   }
 
-  Future<void> _syncFromNetwork(bool background) async {
+  Future<void> _syncFromNetwork({
+    bool background = false,
+    bool force = false,
+  }) async {
     if (isSyncInProgress) {
       return;
     }
@@ -137,7 +141,7 @@ mixin SyncerCore<DataType> implements WidgetsBindingObserver {
       if (isModifiable && isModified) {
         await _saveToNetwork();
       } else {
-        if (DateTime.now().difference(_lastFetch) > syncDuration) {
+        if (force || DateTime.now().difference(_lastFetch) > syncDuration) {
           await _loadFromNetwork(background);
           _lastFetch = DateTime.now();
         }
