@@ -61,34 +61,35 @@ Future<bool> showConfirmDialog(
   VoidCallback? cancleAction,
 }) async {
   return await showDialog(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(title),
-      content: Text(message),
-      actions: [
-        TextButton(
-          onPressed: () {
-            if (cancleAction != null) cancleAction();
-            Navigator.pop(ctx, false);
-          },
-          child: Text(cancleText),
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (cancleAction != null) cancleAction();
+                Navigator.pop(ctx, false);
+              },
+              child: Text(cancleText),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isDeletion
+                    ? Theme.of(context).colorScheme.error
+                    : Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                if (okAction != null) okAction();
+                Navigator.pop(ctx, true);
+              },
+              child: Text(okText),
+            ),
+          ],
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isDeletion
-                ? Theme.of(context).colorScheme.error
-                : Theme.of(context).colorScheme.primary,
-            foregroundColor: Colors.white,
-          ),
-          onPressed: () {
-            if (okAction != null) okAction();
-            Navigator.pop(ctx, true);
-          },
-          child: Text(okText),
-        ),
-      ],
-    ),
-  );
+      ) ??
+      false;
 }
 
 bool isDesktopPlatform() =>
