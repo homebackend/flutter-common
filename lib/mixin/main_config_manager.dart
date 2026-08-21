@@ -30,7 +30,7 @@ mixin MainConfigManager {
       ),
     );
 
-    configBackup["timestamp"] = DateTime.now().toIso8601String();
+    configBackup['timestamp'] = DateTime.now().toIso8601String();
 
     return configBackup;
   }
@@ -58,7 +58,7 @@ mixin MainConfigManager {
       final String jsonString = json.encode(configBackup);
       final Uint8List fileBytes = Uint8List.fromList(utf8.encode(jsonString));
 
-      final String? outputPath = await FilePicker.saveFile(
+      final outputPath = await FilePicker.saveFile(
         dialogTitle: 'Export Configuration Settings',
         fileName: '${configFileBaseName}_backup.json',
         type: FileType.custom,
@@ -67,24 +67,24 @@ mixin MainConfigManager {
       );
 
       if (outputPath != null) {
-        await File(outputPath).writeAsBytes(fileBytes);
-        return "Configuration keys backed up cleanly!";
+        await File(outputPath.path).writeAsBytes(fileBytes);
+        return 'Configuration keys backed up cleanly!';
       }
     } catch (e) {
-      return "Export failed: $e";
+      return 'Export failed: $e';
     }
     return null;
   }
 
   Future<String?> importSystemPreferences() async {
     try {
-      final FilePickerResult? result = await FilePicker.pickFiles(
+      final result = await FilePicker.pickFile(
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
 
-      if (result != null && result.files.single.path != null) {
-        final File selectedFile = File(result.files.single.path!);
+      if (result != null && result.path != null) {
+        final File selectedFile = File(result.path!);
         final Map<String, dynamic> config = json.decode(
           await selectedFile.readAsString(),
         );
@@ -99,7 +99,7 @@ mixin MainConfigManager {
         return 'Import failed: No file selected';
       }
     } catch (e) {
-      return "Import failed: Invalid configuration template. $e";
+      return 'Import failed: Invalid configuration template. $e';
     }
   }
 
@@ -119,7 +119,7 @@ mixin MainConfigManager {
           ? null
           : 'Import failed: Some configuration parameters are missing';
     } catch (e) {
-      return "Import failed: Invalid JSON in clipboard. $e";
+      return 'Import failed: Invalid JSON in clipboard. $e';
     }
   }
 }
