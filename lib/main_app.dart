@@ -12,8 +12,8 @@ import 'cubit/settings/theme_cubit.dart';
 import 'cubit/startup/app_initialization_cubit.dart';
 import 'splash.dart';
 import 'tool.dart';
-import 'update_app.dart';
-import 'widgets/app_update_detailer.dart';
+import 'widgets/app_update_dialog.dart';
+import 'widgets/auto_update_dialog.dart';
 
 class MainApp extends StatefulWidget {
   final String githubOrganization;
@@ -100,17 +100,32 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
                       >(
                         listenWhen: (_, current) =>
                             current.state ==
-                            AppInitializationState.showUpdateDetails,
+                                AppInitializationState.showUpdateDetails ||
+                            current.state == AppInitializationState.updateApp,
                         listener: (context, status) {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (dialogContext) => AppUpdateDialog(
-                              downloadUrl: status.downloadUrl,
-                              latestVersion: status.latestVersion,
-                              changeLog: status.changeLog,
-                            ),
-                          );
+                          if (status.state ==
+                              AppInitializationState.showUpdateDetails) {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (dialogContext) => AppUpdateDialog(
+                                downloadUrl: status.downloadUrl,
+                                latestVersion: status.latestVersion,
+                                changeLog: status.changeLog,
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (_) => AutoUpdateDialog(
+                                upgradeFileName: widget.upgradeFileName,
+                                downloadUrl: status.downloadUrl,
+                                latestVersion: status.latestVersion,
+                                changeLog: status.changeLog,
+                              ),
+                            );
+                          }
                         },
                       ),
                       BlocListener<
@@ -137,26 +152,11 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
                           AppInitializationStatus
                         >(
                           builder: (context, status) {
-                            switch (status.state) {
-                              case AppInitializationState.initialization:
-                                return SplashScreen(widget.appIcon);
-                              case AppInitializationState.showUpdateDetails:
-                                return widget.mainApp();
-                              case AppInitializationState.updateApp:
-                                return UpdateApp(
-                                  widget.appName,
-                                  widget.upgradeFileName,
-                                  status.downloadUrl,
-                                  status.latestVersion,
-                                  status.changeLog,
-                                  () => context
-                                      .read<AppInitializationCubit>()
-                                      .emitInitialized(),
-                                );
-                              case AppInitializationState.initialized:
-                                return widget.mainApp();
-                              case AppInitializationState.updateCheckFailed:
-                                return widget.mainApp();
+                            if (status.state ==
+                                AppInitializationState.initialization) {
+                              return SplashScreen(widget.appIcon);
+                            } else {
+                              return widget.mainApp();
                             }
                           },
                         ),
