@@ -32,11 +32,8 @@ class AppInitializationCubit extends Cubit<AppInitializationStatus> {
 
   Future<void> initialize() async {
     emit(AppInitializationStatus(AppInitializationState.initialization));
-    if (isMobilePlatform() || isDesktopPlatform()) {
-      await checkUpdateRequired();
-    } else {
-      emitInitialized();
-    }
+    await Future.delayed(const Duration(milliseconds: 400));
+    emitInitialized();
   }
 
   void emitInitialized() {

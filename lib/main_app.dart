@@ -47,11 +47,23 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsFlutterBinding.ensureInitialized();
+    WidgetsBinding.instance.addObserver(this);
     _appInitializationCubit = AppInitializationCubit(
       widget.githubOrganization,
       widget.githubRepo,
       widget.baseAssetName,
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _appInitializationCubit.checkUpdateRequired();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _appInitializationCubit.close();
+    super.dispose();
   }
 
   @override
